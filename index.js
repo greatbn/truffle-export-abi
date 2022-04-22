@@ -24,10 +24,15 @@ function exportAbiForFile(filename) {
   if (filename.endsWith(".json")) {
     const data = fs.readFileSync(filename);
     const jsonData = JSON.parse(data);
+    var networkABI = {};
     if (jsonData.hasOwnProperty("abi")) {
       logger.info("Found ABI in: " + filename);
-      return jsonData["abi"];
+      networkABI["abi"] = jsonData["abi"];
     }
+    if (jsonData.hasOwnProperty("networks")) {
+      networkABI["networks"] = jsonData["networks"];
+    }
+    return networkABI;
   }
   return null;
 }
