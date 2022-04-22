@@ -32,19 +32,6 @@ function exportAbiForFile(filename) {
   return null;
 }
 
-function exportAbiForDirectory(directory) {
-  var res = [];
-  const fileList = fs.readdirSync(directory);
-  logger.info("Looking for json files in: " + directory);
-  fileList.forEach(filename => {
-    jsonAbi = exportAbiForFile(path.join(directory, filename));
-    if (jsonAbi !== null) {
-      res = _.union(res, jsonAbi);
-    }
-  });
-  return res;
-}
-
 function printHelp() {
   console.log(
     "Example: " +
@@ -68,8 +55,16 @@ function main() {
   }
   fs.stat(args.directory, (err, stats) => {
     if (!err && stats.isDirectory()) {
-      abi = exportAbiForDirectory(args.directory);
-      fs.writeFileSync(args.output, JSON.stringify(abi, null, 2));
+      // abi = exportAbiForDirectory(args.directory);
+      const fileList = fs.readdirSync(args.directory);
+      logger.info("Looking for json files in: " + args.directory);
+      fileList.forEach(filename => {
+        jsonAbi = exportAbiForFile(path.join(args.directory, filename));
+        if (jsonAbi !== null) {
+          fs.writeFileSync(path.join(args.output, filename), JSON.stringify(jsonAbi, null, 2));
+        }
+      });
+
       logger.notice("ABI extracted and output file wrote to: " + args.output);
     } else {
       logger.error(
